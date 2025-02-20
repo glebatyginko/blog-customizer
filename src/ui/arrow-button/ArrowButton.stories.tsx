@@ -5,6 +5,7 @@ import { createElement, useState } from 'react';
 
 const meta: Meta<typeof ArrowButton> = {
 	component: ArrowButton,
+	tags: ['autodocs'],
 };
 
 export default meta;
