@@ -15,27 +15,28 @@ import {
 	contentWidthArr,
 	fontSizeOptions,
 	defaultArticleState,
+	ArticleStateType,
 } from 'src/constants/articleProps';
 
-export const ArticleParamsForm = () => {
+type ArticleParamsFormProps = {
+	onApply: (newState: ArticleStateType) => void;
+};
+
+export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedFontSize, setSelectedFontSize] = useState(
-		defaultArticleState.fontSizeOption
-	);
-	const [selectedFontFamily, setSelectedFontFamily] = useState(
-		defaultArticleState.fontFamilyOption
-	);
-	const [selectedFontColor, setSelectedFontColor] = useState(
-		defaultArticleState.fontColor
-	);
-	const [selectedBackgroundColor, setSelectedBackgroundColor] = useState(
-		defaultArticleState.backgroundColor
-	);
-	const [selectedContentWidth, setSelectedContentWidth] = useState(
-		defaultArticleState.contentWidth
-	);
+	const [formState, setFormState] = useState(defaultArticleState);
 
 	const sidebarRef = useRef<HTMLDivElement | null>(null);
+
+	const handleChange = <K extends keyof ArticleStateType>(
+		key: K,
+		value: ArticleStateType[K]
+	) => {
+		setFormState((prevState) => ({
+			...prevState,
+			[key]: value,
+		}));
+	};
 
 	useOutsideClickClose({
 		isOpen,
@@ -47,26 +48,13 @@ export const ArticleParamsForm = () => {
 		setIsOpen((prevState) => !prevState);
 	};
 
-	const handleFontSizeChange = (value: typeof selectedFontSize) => {
-		setSelectedFontSize(value);
+	const handleApply = () => {
+		onApply(formState);
 	};
 
-	const handleFontFamilyChange = (selected: typeof selectedFontFamily) => {
-		setSelectedFontFamily(selected);
-	};
-
-	const handleFontColorChange = (selected: typeof selectedFontColor) => {
-		setSelectedFontColor(selected);
-	};
-
-	const handleBackgroundColorChange = (
-		selected: typeof selectedBackgroundColor
-	) => {
-		setSelectedBackgroundColor(selected);
-	};
-
-	const handleContentWidthChange = (selected: typeof selectedContentWidth) => {
-		setSelectedContentWidth(selected);
+	const handleReset = () => {
+		setFormState(defaultArticleState);
+		onApply(defaultArticleState);
 	};
 
 	return (
@@ -83,41 +71,51 @@ export const ArticleParamsForm = () => {
 							Задайте параметры
 						</Text>
 						<Select
-							selected={selectedFontFamily}
+							selected={formState.fontFamilyOption}
 							options={fontFamilyOptions}
-							onChange={handleFontFamilyChange}
+							onChange={(value) => handleChange('fontFamilyOption', value)}
 							title='Шрифт'
 						/>
 						<RadioGroup
 							name='font-size'
 							options={fontSizeOptions}
-							selected={selectedFontSize}
-							onChange={handleFontSizeChange}
+							selected={formState.fontSizeOption}
+							onChange={(value) => handleChange('fontSizeOption', value)}
 							title='Размер шрифта'
 						/>
 						<Select
-							selected={selectedFontColor}
+							selected={formState.fontColor}
 							options={fontColors}
-							onChange={handleFontColorChange}
+							onChange={(value) => handleChange('fontColor', value)}
 							title='Цвет шрифта'
 						/>
 						<Separator />
 						<Select
-							selected={selectedBackgroundColor}
+							selected={formState.backgroundColor}
 							options={backgroundColors}
-							onChange={handleBackgroundColorChange}
+							onChange={(value) => handleChange('backgroundColor', value)}
 							title='Цвет фона'
 						/>
 						<Select
-							selected={selectedContentWidth}
+							selected={formState.contentWidth}
 							options={contentWidthArr}
-							onChange={handleContentWidthChange}
+							onChange={(value) => handleChange('contentWidth', value)}
 							title='Ширина контента'
 						/>
 					</GapWrapper>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' htmlType='reset' type='clear' />
-						<Button title='Применить' htmlType='submit' type='apply' />
+						<Button
+							title='Сбросить'
+							htmlType='button'
+							type='clear'
+							onClick={handleReset}
+						/>
+						<Button
+							title='Применить'
+							htmlType='button'
+							type='apply'
+							onClick={handleApply}
+						/>
 					</div>
 				</form>
 			</aside>
